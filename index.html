@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jeu de tri des biais cognitifs (TCC)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Chart.js pour le graphique -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" crossorigin="anonymous"></script>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f5fb;
+      color: #222;
+    }
+
+    header {
+      background: #3949ab;
+      color: white;
+      padding: 1rem 1.5rem;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+
+    header p {
+      margin: 0.3rem 0 0;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 1rem auto 2rem;
+      padding: 0 1rem;
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.8fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      padding: 1rem 1.25rem;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      margin-top: 0;
+      margin-bottom: 0.6rem;
+      color: #283593;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 0.7rem;
+    }
+
+    #current-thought {
+      background: #e8eaf6;
+      border-left: 4px solid #3f51b5;
+      padding: 0.8rem 0.9rem;
+      border-radius: 4px;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      font-size: 0.98rem;
+    }
+
+    #controls {
+      margin-top: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .small-text {
+      font-size: 0.8rem;
+      color: #666;
+      flex: 1 1 160px;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      background: #3f51b5;
+      color: white;
+      transition: background 0.15s ease, transform 0.05s ease;
+      white-space: nowrap;
+    }
+
+    button:hover { background: #303f9f; }
+    button:active { transform: scale(0.97); }
+
+    button.secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+    button.secondary:hover { background: #d5d5d5; }
+
+    button.danger {
+      background: #c62828;
+      color: #fff;
+    }
+    button.danger:hover { background: #b71c1c; }
+
+    @media (max-width: 600px) {
+      #controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      #controls > div:last-child button,
+      .save-row-buttons button {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    #feedback {
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+      min-height: 1.4rem;
+    }
+
+    .feedback-ok { color: #1b5e20; }
+    .feedback-error { color: #b71c1c; }
+
+    #stats {
+      margin-top: 0.3rem;
+      font-size: 0.8rem;
+      color: #555;
+    }
+
+    .bias-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .bias-btn {
+      width: 100%;
+      text-align: left;
+      background: #e3f2fd;
+      color: #0d47a1;
+      border-radius: 6px;
+      border: 1px solid #bbdefb;
+      padding: 0.4rem 0.5rem;
+      font-size: 0.82rem;
+      cursor: pointer;
+      line-height: 1.2;
+      transition: background 0.1s ease, transform 0.05s ease;
+    }
+
+    .bias-btn:hover { background: #bbdefb; }
+    .bias-btn:active { transform: scale(0.98); }
+
+    .bias-name { font-weight: 600; display: block; }
+    .bias-short { font-size: 0.75rem; opacity: 0.9; }
+
+    .bias-btn-correct {
+      background: #c8e6c9 !important;
+      border-color: #81c784 !important;
+      color: #1b5e20 !important;
+    }
+
+    .bias-btn-wrong {
+      background: #ffcdd2 !important;
+      border-color: #e57373 !important;
+      color: #b71c1c !important;
+    }
+
+    #bias-detail {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #444;
+      min-height: 1.2rem;
+    }
+
+    textarea, select {
+      width: 100%;
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid #c5cae9;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+      margin-bottom: 0.15rem;
+      color: #444;
+    }
+
+    .form-row { margin-bottom: 0.4rem; }
+
+    .pill {
+      display: inline-block;
+      padding: 0.1rem 0.4rem;
+      border-radius: 999px;
+      background: #eeeeee;
+      font-size: 0.75rem;
+      color: #555;
+      margin-right: 0.3rem;
+    }
+
+    .thought-list {
+      margin-top: 0.6rem;
+      max-height: 220px;
+      overflow-y: auto;
+      border-top: 1px solid #eee;
+      padding-top: 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .thought-item {
+      padding: 0.3rem 0;
+      border-bottom: 1px dotted #eee;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .thought-main-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.3rem;
+    }
+
+    .thought-text { flex: 1; }
+
+    .thought-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .tag-predef { background: #e3f2fd; color: #0d47a1; }
+    .tag-patient { background: #e8f5e9; color: #1b5e20; }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #777;
+      padding: 0.8rem 0.5rem 1.2rem;
+    }
+
+    .history-info {
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+      color: #555;
+    }
+
+    .history-info code { font-size: 0.78rem; }
+
+    #chart-block {
+      margin-top: 1.2rem;
+      display: block;
+    }
+
+    #chart-container {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      box-sizing: border-box;
+      padding-bottom: 40px;
+      overflow: hidden;
+    }
+
+    @media (max-width: 600px) {
+      #chart-container {
+        height: 260px;
+        padding-bottom: 30px;
+      }
+    }
+
+    #progressChart {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .save-row {
+      margin-top: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      align-items: flex-start;
+    }
+
+    .save-row span {
+      font-size: 0.8rem;
+      color: #555;
+    }
+
+    .save-row-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Jeu de tri des biais cognitifs</h1>
+    <p>Outil TCC pour repérer les distorsions cognitives et les nommer.</p>
+  </header>
+
+  <main>
+    <section class="card" aria-label="Jeu de tri">
+      <h2>1. Trier la pensée</h2>
+      <p class="subtitle">Lire la pensée puis cliquer sur le biais qui correspond le mieux.</p>
+
+      <div id="current-thought">
+        Chargement de la première pensée...
+      </div>
+
+      <div id="controls">
+        <div class="small-text">
+          Pensées pré-remplies et pensées ajoutées par le patient peuvent être mélangées selon le réglage ci-dessous.
+        </div>
+        <div>
+          <button id="skip-btn" class="secondary" type="button">Passer</button>
+          <button id="new-random-btn" class="secondary" type="button">Nouvelle pensée</button>
+        </div>
+      </div>
+
+      <div id="feedback" role="status" aria-live="polite"></div>
+      <div id="stats"></div>
+
+      <div class="form-row" style="margin-top:0.6rem;">
+        <label for="thought-source-select">Source des pensées utilisées dans le jeu</label>
+        <select id="thought-source-select">
+          <option value="all">Pré-remplies + pensées patient</option>
+          <option value="patient">Uniquement pensées patient</option>
+          <option value="predef">Uniquement pensées pré-remplies</option>
+        </select>
+      </div>
+
+      <h2 style="margin-top:1.2rem;">2. Choisir un biais</h2>
+      <p class="subtitle">
+        Survoler un biais pour voir sa définition, cliquer pour répondre.
+      </p>
+
+      <div class="bias-grid" id="bias-list"></div>
+      <div id="bias-detail"></div>
+
+      <div id="chart-block">
+        <div id="chart-container">
+          <h2>3. Progression du taux de réussite</h2>
+          <canvas id="progressChart" aria-label="Graphique du taux de réussite par séance"></canvas>
+        </div>
+
+        <div class="history-info">
+          Chaque point correspond à une séance (enregistrement) avec date et heure. [web:102][web:104]
+        </div>
+
+        <div class="save-row">
+          <span>
+            Enregistrer la séance (pensées ajoutées + taux de réussite de cette séance).
+          </span>
+          <div class="save-row-buttons">
+            <button id="reset-chart-btn" class="secondary danger" type="button">Remettre à zéro le graphique</button>
+            <button id="save-session-btn" type="button">Enregistrer la séance</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-label="Ajout de pensées">
+      <h2>Ajouter une pensée du patient</h2>
+      <p class="subtitle">Permet de travailler sur des situations personnelles, tout en les classant par biais.</p>
+
+      <form id="new-thought-form" onsubmit="return false;">
+        <div class="form-row">
+          <label for="new-thought-text">Pensée (telle qu'elle apparaît au patient)</label>
+          <textarea id="new-thought-text" placeholder="Ex. : Si je ne réussis pas parfaitement ce travail, c'est que je suis nul."></textarea>
+        </div>
+
+        <div class="form-row">
+          <label for="new-thought-bias">Biais cognitif principal</label>
+          <select id="new-thought-bias"></select>
+        </div>
+
+        <div class="form-row" style="margin-top:0.6rem;">
+          <button id="add-thought-btn" type="button">Ajouter la pensée</button>
+        </div>
+      </form>
+
+      <div class="small-text" style="margin-top:0.5rem;">
+        Les pensées ajoutées et l'historique des séances sont stockés uniquement dans ce navigateur (localStorage, aucune transmission externe).[web:221][web:224]
+      </div>
+
+      <h2 style="margin-top:1.1rem;">Pensées présentes dans le jeu</h2>
+      <div class="thought-list" id="thought-list"></div>
+    </section>
+  </main>
+
+  <footer>
+    Utilisation clinique : adapter la liste de biais et de pensées selon le cadre et le patient.
+  </footer>
+
+  <script>
+    /* ---- Script complet compatible navigateurs + mobile ---- */
+
+    var biases = [
+      { id: "tout_ou_rien", nom: "Tout ou rien", short: "Pensée dichotomique",
+        description: "Vision en noir ou blanc, sans nuance : les choses sont soit un succès total, soit un échec complet.",
+        exemple: "Si ce n'est pas parfait, c'est complètement raté." },
+      { id: "surgeneralisation", nom: "Surgénéralisation", short: "Règle générale à partir d'un cas",
+        description: "Tirer une règle générale à partir d'un seul événement négatif.",
+        exemple: "J'ai raté cet examen, je raterai toujours tout." },
+      { id: "filtre_mental", nom: "Filtre mental", short: "Abstraction sélective",
+        description: "Ne retenir qu'un détail négatif d'une situation en oubliant le reste.",
+        exemple: "On m'a fait un compliment mais je ne pense qu'à la remarque critique." },
+      { id: "disqualification_positif", nom: "Disqualification du positif", short: "Alchimie inversée",
+        description: "Transformer les expériences positives en quelque chose de négatif ou sans valeur.",
+        exemple: "Il me complimente, mais c'est juste pour être poli." },
+      { id: "lecture_pensee", nom: "Lecture de pensée / inférence arbitraire", short: "Conclusion hâtive",
+        description: "Croire savoir ce que les autres pensent ou tirer une conclusion sans preuve suffisante.",
+        exemple: "Il n'a pas répondu à mon message, il doit me trouver inintéressant." },
+      { id: "catastrophisation", nom: "Catastrophisation", short: "Anticipation du pire",
+        description: "Imaginer le pire scénario possible et le considérer comme inévitable.",
+        exemple: "Si je fais une erreur, ce sera une catastrophe et tout sera fichu." },
+      { id: "raisonnement_emotionnel", nom: "Raisonnement émotionnel", short: "Sentiment = preuve",
+        description: "Considérer ses émotions comme des preuves de la réalité.",
+        exemple: "Je me sens incapable, donc je suis incapable." },
+      { id: "exigences_personnelles", nom: "Exigences personnelles", short: "Il faut / je dois",
+        description: "Se fixer des règles rigides sur ce qu'on doit faire ou être.",
+        exemple: "Je dois toujours tout contrôler, sinon c'est inacceptable." },
+      { id: "etiquetage", nom: "Étiquetage", short: "Jugement global",
+        description: "Coller une étiquette globale sur soi ou les autres à partir d'un comportement.",
+        exemple: "J'ai fait une erreur, je suis nul." },
+      { id: "personnalisation", nom: "Personnalisation", short: "Se croire responsable de tout",
+        description: "Se sentir responsable d'événements extérieurs, indépendamment des faits.",
+        exemple: "S'ils sont de mauvaise humeur, c'est sûrement à cause de moi." }
+    ];
+
+    var baseThoughts = [
+      { id: 1, texte: "Si je fais une erreur pendant la présentation, tout le monde va me trouver nul.", biasId: "catastrophisation" },
+      { id: 2, texte: "J'ai raté cet entretien, je n'arriverai jamais à trouver un travail.", biasId: "surgeneralisation" },
+      { id: 3, texte: "On m'a fait plusieurs compliments, mais je ne pense qu'à la remarque négative.", biasId: "filtre_mental" },
+      { id: 4, texte: "Ils ne m'ont pas invité, c'est sûr qu'ils ne m'aiment pas.", biasId: "lecture_pensee" },
+      { id: 5, texte: "Je me sens angoissé, donc il doit forcément y avoir un danger.", biasId: "raisonnement_emotionnel" },
+      { id: 6, texte: "Si je ne réussis pas parfaitement cette tâche, c'est que je suis incompétent.", biasId: "tout_ou_rien" },
+      { id: 7, texte: "Ils me disent que je fais du bon travail, mais ils ne connaissent pas mon vrai niveau.", biasId: "disqualification_positif" },
+      { id: 8, texte: "Je dois toujours être disponible pour les autres, sinon je suis égoïste.", biasId: "exigences_personnelles" },
+      { id: 9, texte: "J'ai oublié ce rendez-vous, je suis vraiment un raté.", biasId: "etiquetage" },
+      { id: 10, texte: "Ils se disputent, c'est sûrement à cause de quelque chose que j'ai fait.", biasId: "personnalisation" }
+    ];
+
+    var thoughts = [];
+    var currentThought = null;
+    var correctCount = 0;
+    var totalAttempts = 0;
+    var statsHistory = [];
+    var progressChart = null;
+    var biasButtonsMap = {};
+    var gameSettings = { sourceFilter: "all" };
+
+    var STORAGE_THOUGHTS_KEY = "cbt_bias_game_thoughts_v1";
+    var STORAGE_STATS_KEY = "cbt_bias_game_stats_v1";
+    var STORAGE_SETTINGS_KEY = "cbt_bias_game_settings_v1";
+
+    function getBiasById(id) {
+      for (var i = 0; i < biases.length; i++) {
+        if (biases[i].id === id) return biases[i];
+      }
+      return null;
+    }
+
+    function formatSessionLabel(session, index) {
+      var d = new Date(session.timestamp);
+      var day = ("0" + d.getDate()).slice(-2);
+      var month = ("0" + (d.getMonth() + 1)).slice(-2);
+      var hours = ("0" + d.getHours()).slice(-2);
+      var minutes = ("0" + d.getMinutes()).slice(-2);
+      var sessionNum = index + 1;
+      return "Séance " + sessionNum + " – " + day + "/" + month + " " + hours + "h" + minutes;
+    }
+
+    function pickRandomThought() {
+      var box = document.getElementById("current-thought");
+      if (!thoughts || thoughts.length === 0) {
+        currentThought = null;
+        if (box) {
+          box.textContent = "Aucune pensée disponible avec ce réglage. Ajoutez des pensées ou changez la source.";
+        }
+        var fb = document.getElementById("feedback");
+        if (fb) fb.textContent = "";
+        clearBiasButtonColors();
+        return;
+      }
+      var index = Math.floor(Math.random() * thoughts.length);
+      currentThought = thoughts[index];
+      if (box) box.textContent = currentThought.texte;
+      var fb2 = document.getElementById("feedback");
+      if (fb2) fb2.textContent = "";
+      clearBiasButtonColors();
+    }
+
+    function updateStatsText() {
+      var statsEl = document.getElementById("stats");
+      if (!statsEl) return;
+      if (totalAttempts === 0) {
+        statsEl.textContent = "Aucune réponse pour le moment.";
+        return;
+      }
+      var percent = Math.round((correctCount / totalAttempts) * 100);
+      statsEl.textContent = "Réponses correctes (cette séance) : " +
+        correctCount + " / " + totalAttempts + " (" + percent + " %).";
+    }
+
+    function renderBiasButtons() {
+      var container = document.getElementById("bias-list");
+      if (!container) return;
+      container.innerHTML = "";
+      biasButtonsMap = {};
+      for (var i = 0; i < biases.length; i++) {
+        var bias = biases[i];
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "bias-btn";
+        btn.title = bias.description + "\nExemple : " + bias.exemple;
+        (function(id) {
+          btn.onclick = function() { onBiasClicked(id); };
+        })(bias.id);
+        var nameSpan = document.createElement("span");
+        nameSpan.className = "bias-name";
+        nameSpan.textContent = bias.nom;
+        var shortSpan = document.createElement("span");
+        shortSpan.className = "bias-short";
+        shortSpan.textContent = bias.short;
+        btn.appendChild(nameSpan);
+        btn.appendChild(shortSpan);
+        container.appendChild(btn);
+        biasButtonsMap[bias.id] = btn;
+      }
+    }
+
+    function clearBiasButtonColors() {
+      for (var key in biasButtonsMap) {
+        if (!biasButtonsMap.hasOwnProperty(key)) continue;
+        var btn = biasButtonsMap[key];
+        btn.classList.remove("bias-btn-correct");
+        btn.classList.remove("bias-btn-wrong");
+      }
+    }
+
+    function onBiasClicked(biasId) {
+      if (!currentThought) return;
+      var bias = getBiasById(biasId);
+      var detail = document.getElementById("bias-detail");
+      if (detail && bias) {
+        detail.textContent = bias.nom + " : " + bias.description + " (Exemple : " + bias.exemple + ")";
+      }
+      var feedback = document.getElementById("feedback");
+      totalAttempts += 1;
+      var isCorrect = (biasId === currentThought.biasId);
+      clearBiasButtonColors();
+      if (feedback) {
+        if (isCorrect) {
+          feedback.textContent = "Correct : " + (bias ? bias.description : "");
+          feedback.className = "feedback-ok";
+          correctCount += 1;
+          var clickedBtn = biasButtonsMap[biasId];
+          if (clickedBtn) clickedBtn.classList.add("bias-btn-correct");
+        } else {
+          var correctBias = getBiasById(currentThought.biasId);
+          feedback.textContent = "Incorrect. Biais attendu : " +
+            (correctBias ? correctBias.nom + " – " + correctBias.description : "");
+          feedback.className = "feedback-error";
+          var clicked = biasButtonsMap[biasId];
+          if (clicked) clicked.classList.add("bias-btn-wrong");
+          var correctBtn = biasButtonsMap[currentThought.biasId];
+          if (correctBtn) correctBtn.classList.add("bias-btn-correct");
+        }
+      }
+      updateStatsText();
+      setTimeout(function() { pickRandomThought(); }, 1000);
+    }
+
+    function loadSettingsFromLocalStorage() {
+      try {
+        var raw = localStorage.getItem(STORAGE_SETTINGS_KEY);
+        if (!raw) return;
+        var parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object" && parsed.sourceFilter) {
+          gameSettings.sourceFilter = parsed.sourceFilter;
+        }
+      } catch (e) {
+        console.warn("Impossible de charger les paramètres.", e);
+      }
+    }
+
+    function saveSettingsToLocalStorage() {
+      try {
+        localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(gameSettings));
+      } catch (e) {
+        console.warn("Impossible d'enregistrer les paramètres.", e);
+      }
+    }
+
+    function loadPatientThoughtsArray() {
+      var patientThoughts = [];
+      try {
+        var raw = localStorage.getItem(STORAGE_THOUGHTS_KEY);
+        if (!raw) return [];
+        var arr = JSON.parse(raw);
+        if (Object.prototype.toString.call(arr) === "[object Array]") {
+          for (var i = 0; i < arr.length; i++) {
+            var t = arr[i];
+            patientThoughts.push({ id: t.id, texte: t.texte, biasId: t.biasId, source: "patient" });
+          }
+        }
+      } catch (e) {
+        console.warn("Impossible de charger les pensées patient.", e);
+      }
+      return patientThoughts;
+    }
+
+    function savePatientThoughtsArray(arr) {
+      try {
+        localStorage.setItem(STORAGE_THOUGHTS_KEY, JSON.stringify(arr));
+      } catch (e) {
+        console.warn("Impossible d'enregistrer les pensées.", e);
+      }
+    }
+
+    function loadStatsHistoryFromLocalStorage() {
+      try {
+        var raw = localStorage.getItem(STORAGE_STATS_KEY);
+        if (!raw) {
+          statsHistory = [];
+          return;
+        }
+        var parsed = JSON.parse(raw);
+        statsHistory = Object.prototype.toString.call(parsed) === "[object Array]" ? parsed : [];
+      } catch (e) {
+        console.warn("Impossible de charger les stats.", e);
+        statsHistory = [];
+      }
+    }
+
+    function saveStatsHistoryToLocalStorage() {
+      try {
+        localStorage.setItem(STORAGE_STATS_KEY, JSON.stringify(statsHistory));
+      } catch (e) {
+        console.warn("Impossible d'enregistrer les stats.", e);
+      }
+    }
+
+    function rebuildThoughtsArray() {
+      var patientThoughts = loadPatientThoughtsArray();
+      var predefThoughts = [];
+      for (var i = 0; i < baseThoughts.length; i++) {
+        predefThoughts.push({
+          id: baseThoughts[i].id,
+          texte: baseThoughts[i].texte,
+          biasId: baseThoughts[i].biasId,
+          source: "predefinie"
+        });
+      }
+      if (gameSettings.sourceFilter === "patient") {
+        thoughts = patientThoughts;
+      } else if (gameSettings.sourceFilter === "predef") {
+        thoughts = predefThoughts;
+      } else {
+        thoughts = predefThoughts.concat(patientThoughts);
+      }
+      renderThoughtList();
+      pickRandomThought();
+    }
+
+    function initNewThoughtForm() {
+      var select = document.getElementById("new-thought-bias");
+      if (!select) return;
+      for (var i = 0; i < biases.length; i++) {
+        var bias = biases[i];
+        var opt = document.createElement("option");
+        opt.value = bias.id;
+        opt.textContent = bias.nom;
+        select.appendChild(opt);
+      }
+      var addBtn = document.getElementById("add-thought-btn");
+      if (addBtn) {
+        addBtn.onclick = function () {
+          var textEl = document.getElementById("new-thought-text");
+          if (!textEl) return;
+          var text = textEl.value.replace(/\s+/g, " ").trim();
+          if (!text) {
+            alert("Merci de saisir une pensée avant de l'ajouter.");
+            return;
+          }
+          var biasId = select.value;
+          var newThought = {
+            id: Date.now(),
+            texte: text,
+            biasId: biasId,
+            source: "patient"
+          };
+          var existingPatient = loadPatientThoughtsArray();
+          existingPatient.push(newThought);
+          savePatientThoughtsArray(existingPatient);
+          textEl.value = "";
+          rebuildThoughtsArray();
+        };
+      }
+    }
+
+    function deletePatientThought(id) {
+      var existingPatient = loadPatientThoughtsArray().filter(function (t) {
+        return t.id !== id;
+      });
+      savePatientThoughtsArray(existingPatient);
+      rebuildThoughtsArray();
+    }
+
+    function renderThoughtList() {
+      var listEl = document.getElementById("thought-list");
+      if (!listEl) return;
+      listEl.innerHTML = "";
+      if (!thoughts || thoughts.length === 0) return;
+      var copy = thoughts.slice().reverse();
+      for (var i = 0; i < copy.length; i++) {
+        var t = copy[i];
+        var bias = getBiasById(t.biasId);
+        var item = document.createElement("div");
+        item.className = "thought-item";
+        var topRow = document.createElement("div");
+        topRow.className = "thought-main-row";
+        var left = document.createElement("div");
+        left.className = "thought-text";
+        var pillsRow = document.createElement("div");
+        var sourcePill = document.createElement("span");
+        sourcePill.className = "pill " + (t.source === "patient" ? "tag-patient" : "tag-predef");
+        sourcePill.textContent = t.source === "patient" ? "Ajout patient" : "Pré-remplie";
+        var biasPill = document.createElement("span");
+        biasPill.className = "pill";
+        biasPill.textContent = bias ? bias.nom : "Biais inconnu";
+        pillsRow.appendChild(sourcePill);
+        pillsRow.appendChild(biasPill);
+        var textSpan = document.createElement("div");
+        textSpan.textContent = t.texte;
+        left.appendChild(pillsRow);
+        left.appendChild(textSpan);
+        var actions = document.createElement("div");
+        actions.className = "thought-actions";
+        if (t.source === "patient") {
+          var delBtn = document.createElement("button");
+          delBtn.type = "button";
+          delBtn.textContent = "Supprimer";
+          delBtn.className = "secondary danger";
+          delBtn.style.fontSize = "0.75rem";
+          (function (idToDelete) {
+            delBtn.onclick = function () {
+              if (confirm("Supprimer cette pensée ajoutée par le patient ?")) {
+                deletePatientThought(idToDelete);
+              }
+            };
+          })(t.id);
+          actions.appendChild(delBtn);
+        }
+        topRow.appendChild(left);
+        topRow.appendChild(actions);
+        item.appendChild(topRow);
+        listEl.appendChild(item);
+      }
+    }
+
+    function buildChartDataFromHistory() {
+      var labels = [];
+      var data = [];
+      for (var i = 0; i < statsHistory.length; i++) {
+        var session = statsHistory[i];
+        if (!session.total) continue;
+        var percent = Math.round((session.correct / session.total) * 100);
+        labels.push(formatSessionLabel(session, i));
+        data.push(percent);
+      }
+      return { labels: labels, data: data };
+    }
+
+    function renderProgressChart() {
+      var canvas = document.getElementById("progressChart");
+      if (!canvas || typeof Chart === "undefined") return;
+      var cd = buildChartDataFromHistory();
+      var labels = cd.labels;
+      var data = cd.data;
+      if (progressChart) {
+        progressChart.data.labels = labels;
+        progressChart.data.datasets[0].data = data;
+        progressChart.update();
+        return;
+      }
+      var ctx = canvas.getContext("2d");
+      progressChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: "Taux de réussite (%)",
+            data: data,
+            borderColor: "#3f51b5",
+            backgroundColor: "rgba(63,81,181,0.15)",
+            tension: 0.2,
+            pointRadius: 3,
+            pointBackgroundColor: "#303f9f"
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, max: 100, ticks: { stepSize: 20 } },
+            x: { ticks: { maxRotation: 60, minRotation: 0 } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    function onSaveSessionClicked() {
+      var session = {
+        timestamp: Date.now(),
+        correct: correctCount,
+        total: totalAttempts
+      };
+      statsHistory.push(session);
+      saveStatsHistoryToLocalStorage();
+      renderProgressChart();
+      alert("Séance enregistrée (pensées patient + taux de réussite).");
+    }
+
+    function onResetChartClicked() {
+      if (!confirm("Remettre à zéro l'historique des séances et le graphique ?")) return;
+      statsHistory = [];
+      saveStatsHistoryToLocalStorage();
+      if (progressChart) {
+        progressChart.data.labels = [];
+        progressChart.data.datasets[0].data = [];
+        progressChart.update();
+      }
+    }
+
+    function initGame() {
+      try {
+        loadSettingsFromLocalStorage();
+        loadStatsHistoryFromLocalStorage();
+        renderBiasButtons();
+        initNewThoughtForm();
+        var sourceSelect = document.getElementById("thought-source-select");
+        if (sourceSelect) {
+          sourceSelect.value = gameSettings.sourceFilter;
+          sourceSelect.onchange = function () {
+            gameSettings.sourceFilter = sourceSelect.value;
+            saveSettingsToLocalStorage();
+            rebuildThoughtsArray();
+          };
+        }
+        rebuildThoughtsArray();
+        updateStatsText();
+        renderProgressChart();
+        var newBtn = document.getElementById("new-random-btn");
+        var skipBtn = document.getElementById("skip-btn");
+        var saveBtn = document.getElementById("save-session-btn");
+        var resetBtn = document.getElementById("reset-chart-btn");
+        if (newBtn) newBtn.onclick = pickRandomThought;
+        if (skipBtn) skipBtn.onclick = pickRandomThought;
+        if (saveBtn) saveBtn.onclick = onSaveSessionClicked;
+        if (resetBtn) resetBtn.onclick = onResetChartClicked;
+      } catch (e) {
+        console.error("Erreur pendant l'initialisation :", e);
+        var box = document.getElementById("current-thought");
+        if (box) box.textContent = "Une erreur s'est produite lors du chargement du jeu.";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", initGame, false);
+  </script>
+</body>
+</html>
