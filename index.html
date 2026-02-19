@@ -336,15 +336,28 @@
   <main>
     <section class="card" aria-label="Jeu de tri">
       <h2>1. Trier la pensée</h2>
-      <p class="subtitle">Lire la pensée puis cliquer sur le biais qui correspond le mieux.</p>
+      <p class="subtitle">
+        Choisir d’abord la source des pensées, puis classer la pensée affichée en cliquant sur un biais pour répondre et afficher sa définition.
+      </p>
 
-      <div id="current-thought">
+      <!-- Sélecteur de source EN PREMIER -->
+      <div class="form-row" style="margin-top:0.2rem;">
+        <label for="thought-source-select">Source des pensées utilisées dans le jeu</label>
+        <select id="thought-source-select">
+          <option value="all">Pré-remplies + pensées patient</option>
+          <option value="patient">Uniquement pensées patient</option>
+          <option value="predef">Uniquement pensées pré-remplies</option>
+        </select>
+      </div>
+
+      <!-- Pensée juste après -->
+      <div id="current-thought" style="margin-top:0.6rem;">
         Chargement de la première pensée...
       </div>
 
       <div id="controls">
         <div class="small-text">
-          Pensées pré-remplies et pensées ajoutées par le patient peuvent être mélangées selon le réglage ci-dessous.
+          Utiliser les boutons pour passer à une autre pensée pré-remplie ou issue du patient.
         </div>
         <div>
           <button id="skip-btn" class="secondary" type="button">Passer</button>
@@ -355,18 +368,9 @@
       <div id="feedback" role="status" aria-live="polite"></div>
       <div id="stats"></div>
 
-      <div class="form-row" style="margin-top:0.6rem;">
-        <label for="thought-source-select">Source des pensées utilisées dans le jeu</label>
-        <select id="thought-source-select">
-          <option value="all">Pré-remplies + pensées patient</option>
-          <option value="patient">Uniquement pensées patient</option>
-          <option value="predef">Uniquement pensées pré-remplies</option>
-        </select>
-      </div>
-
       <h2 style="margin-top:1.2rem;">2. Choisir un biais</h2>
       <p class="subtitle">
-        Survoler un biais pour voir sa définition, cliquer pour répondre.
+        Cliquer sur un biais pour répondre et afficher sa définition sous la liste (fonctionne aussi sur mobile).
       </p>
 
       <div class="bias-grid" id="bias-list"></div>
