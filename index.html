@@ -169,8 +169,8 @@
       line-height: 1.2;
       transition: background 0.1s ease, transform 0.05s ease;
       white-space: normal;
-      word-wrap: break-word;
-      word-break: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
     }
 
     .bias-btn:hover { background: #bbdefb; }
@@ -435,100 +435,52 @@
   </footer>
 
   <script>
-    /* ---- Biais / distorsions issus du document ---- */
-    var biases = [
-      {
-        id: "inference_arbitraire",
-        nom: "Inférence arbitraire",
-        short: "Conclusions hâtives",
-        description: "Tirer des conclusions hâtives (habituellement négatives) à partir de peu d’évidence ou en l’absence d’argument valable.",
-        exemple: "Il ne m’a pas répondu, c’est forcément parce qu’il m’en veut."
-      },
-      {
-        id: "abstraction_selective",
-        nom: "Abstraction sélective",
-        short: "Mettre en avant le négatif",
-        description: "Ne porter attention qu’aux détails négatifs en ignorant les détails positifs.",
-        exemple: "On m’a fait plusieurs compliments et une critique. Quand j'y repense, je ne me rappelle que de la critique."
-      },
-      {
-        id: "surgeneralisation",
-        nom: "Surgénéralisation",
-        short: "Généralisation excessive",
-        description: "Tirer une conclusion générale sur la base d’un seul (ou de quelques) incident(s).",
-        exemple: "J’ai raté cet examen, je raterai toujours tout."
-      },
-      {
-        id: "minimisation_amplification",
-        nom: "Minimisation / Amplification",
-        short: "Minimiser le positif, amplifier le négatif",
-        description: "Donner une plus grande importance à un échec ou une menace qu’à un succès; s’attendre au pire alors qu’il est moins probable que d’autres possibilités.",
-        exemple: "J’ai réussi, mais c’était facile; par contre, mon moindre échec est énorme."
-      },
-      {
-        id: "personnalisation",
-        nom: "Personnalisation",
-        short: "Tout est de ma faute",
-        description: "Des événements extérieurs sont attribués à soi-même.",
-        exemple: "S’ils sont de mauvaise humeur, c’est forcément à cause de moi."
-      },
-      {
-        id: "pensee_dichotomique",
-        nom: "Pensée dichotomique (tout ou rien)",
-        short: "Noir ou blanc",
-        description: "Penser de façon binaire : tout ou rien, noir ou blanc, jamais ou toujours, bon ou mauvais.",
-        exemple: "Si ce n’est pas parfait, c’est complètement raté."
-      },
-      {
-        id: "raisonnement_emotionnel",
-        nom: "Raisonnement émotionnel",
-        short: "Sentiment = preuve",
-        description: "Se servir de ses sentiments comme s’il s’agissait de preuves.",
-        exemple: "Je me sens nul, donc je suis nul."
-      },
-      {
-        id: "blame",
-        nom: "Le blâme",
-        short: "Focalisation sur la faute",
-        description: "Se focaliser sur la personne à blâmer plutôt que sur comment réagir.",
-        exemple: "Tout est de sa faute, je ne peux rien y faire."
-      },
-      {
-        id: "etiquetage",
-        nom: "L’étiquetage",
-        short: "Étiquette globale",
-        description: "L’identité de quelqu’un est caricaturée par un défaut; au lieu de décrire un comportement, on pose un jugement global.",
-        exemple: "J’ai fait une erreur, je suis un raté."
-      },
-      {
-        id: "disqualification_positif",
-        nom: "Disqualification du positif",
-        short: "Annuler le positif",
-        description: "Transformer une expérience neutre ou positive en expérience négative.",
-        exemple: "Il me complimente, mais c’est juste pour être poli."
-      },
-      {
-        id: "catastrophisation",
-        nom: "Catastrophisation",
-        short: "Attente du pire",
-        description: "Rechercher ou imaginer les pires conséquences possibles.",
-        exemple: "Si je me trompe, tout sera fichu."
-      }
-    ]; [file:318]
+    /* ---- Script complet compatible navigateurs + mobile ---- */
 
-    /* ---- Pensées pré-remplies (tu peux les ajuster ensuite) ---- */
+    var biases = [
+      { id: "tout_ou_rien", nom: "Tout ou rien", short: "Pensée dichotomique",
+        description: "Vision en noir ou blanc, sans nuance : les choses sont soit un succès total, soit un échec complet.",
+        exemple: "Si ce n'est pas parfait, c'est complètement raté." },
+      { id: "surgeneralisation", nom: "Surgénéralisation", short: "Règle générale à partir d'un cas",
+        description: "Tirer une règle générale à partir d'un seul événement négatif.",
+        exemple: "J'ai raté cet examen, je raterai toujours tout." },
+      { id: "filtre_mental", nom: "Filtre mental", short: "Abstraction sélective",
+        description: "Ne retenir qu'un détail négatif d'une situation en oubliant le reste.",
+        exemple: "On m'a fait un compliment mais je ne pense qu'à la remarque critique." },
+      { id: "disqualification_positif", nom: "Disqualification du positif", short: "Alchimie inversée",
+        description: "Transformer les expériences positives en quelque chose de négatif ou sans valeur.",
+        exemple: "Il me complimente, mais c'est juste pour être poli." },
+      { id: "lecture_pensee", nom: "Lecture de pensée / inférence arbitraire", short: "Conclusion hâtive",
+        description: "Croire savoir ce que les autres pensent ou tirer une conclusion sans preuve suffisante.",
+        exemple: "Il n'a pas répondu à mon message, il doit me trouver inintéressant." },
+      { id: "catastrophisation", nom: "Catastrophisation", short: "Anticipation du pire",
+        description: "Imaginer le pire scénario possible et le considérer comme inévitable.",
+        exemple: "Si je fais une erreur, ce sera une catastrophe et tout sera fichu." },
+      { id: "raisonnement_emotionnel", nom: "Raisonnement émotionnel", short: "Sentiment = preuve",
+        description: "Considérer ses émotions comme des preuves de la réalité.",
+        exemple: "Je me sens incapable, donc je suis incapable." },
+      { id: "exigences_personnelles", nom: "Exigences personnelles", short: "Il faut / je dois",
+        description: "Se fixer des règles rigides sur ce qu'on doit faire ou être.",
+        exemple: "Je dois toujours tout contrôler, sinon c'est inacceptable." },
+      { id: "etiquetage", nom: "Étiquetage", short: "Jugement global",
+        description: "Coller une étiquette globale sur soi ou les autres à partir d'un comportement.",
+        exemple: "J'ai fait une erreur, je suis nul." },
+      { id: "personnalisation", nom: "Personnalisation", short: "Se croire responsable de tout",
+        description: "Se sentir responsable d'événements extérieurs, indépendamment des faits.",
+        exemple: "S'ils sont de mauvaise humeur, c'est sûrement à cause de moi." }
+    ];
+
     var baseThoughts = [
-      { id: 1, texte: "S’il ne répond pas à mon message rapidement, c’est qu’il m’en veut.", biasId: "inference_arbitraire" },
-      { id: 2, texte: "On m’a félicité pour mon travail, mais je ne pense qu’à la remarque négative.", biasId: "abstraction_selective" },
-      { id: 3, texte: "J’ai raté cette présentation, je raterai toutes les suivantes.", biasId: "surgeneralisation" },
-      { id: 4, texte: "Ce petit échec prouve que je ne réussirai jamais rien d’important.", biasId: "minimisation_amplification" },
-      { id: 5, texte: "S’ils sont tendus aujourd’hui, c’est sûrement à cause de moi.", biasId: "personnalisation" },
-      { id: 6, texte: "Si ce n’est pas parfait, c’est complètement nul.", biasId: "pensee_dichotomique" },
-      { id: 7, texte: "Je me sens angoissé, donc il doit forcément y avoir un danger.", biasId: "raisonnement_emotionnel" },
-      { id: 8, texte: "Tout est de sa faute, je ne peux rien changer à la situation.", biasId: "blame" },
-      { id: 9, texte: "J’ai échoué une fois, je suis un raté.", biasId: "etiquetage" },
-      { id: 10, texte: "Il me fait un compliment, mais ça ne veut rien dire.", biasId: "disqualification_positif" },
-      { id: 11, texte: "Si ça se passe mal, ce sera une catastrophe et je ne m’en remettrai pas.", biasId: "catastrophisation" }
+      { id: 1, texte: "Si je fais une erreur pendant la présentation, tout le monde va me trouver nul.", biasId: "catastrophisation" },
+      { id: 2, texte: "J'ai raté cet entretien, je n'arriverai jamais à trouver un travail.", biasId: "surgeneralisation" },
+      { id: 3, texte: "On m'a fait plusieurs compliments, mais je ne pense qu'à la remarque négative.", biasId: "filtre_mental" },
+      { id: 4, texte: "Ils ne m'ont pas invité, c'est sûr qu'ils ne m'aiment pas.", biasId: "lecture_pensee" },
+      { id: 5, texte: "Je me sens angoissé, donc il doit forcément y avoir un danger.", biasId: "raisonnement_emotionnel" },
+      { id: 6, texte: "Si je ne réussis pas parfaitement cette tâche, c'est que je suis incompétent.", biasId: "tout_ou_rien" },
+      { id: 7, texte: "Ils me disent que je fais du bon travail, mais ils ne connaissent pas mon vrai niveau.", biasId: "disqualification_positif" },
+      { id: 8, texte: "Je dois toujours être disponible pour les autres, sinon je suis égoïste.", biasId: "exigences_personnelles" },
+      { id: 9, texte: "J'ai oublié ce rendez-vous, je suis vraiment un raté.", biasId: "etiquetage" },
+      { id: 10, texte: "Ils se disputent, c'est sûrement à cause de quelque chose que j'ai fait.", biasId: "personnalisation" }
     ];
 
     var thoughts = [];
