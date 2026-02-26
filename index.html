@@ -462,9 +462,6 @@
       { id: "exigences_personnelles", nom: "Exigences personnelles", short: "Il faut / je dois",
         description: "Se fixer des règles rigides sur ce qu'on doit faire ou être.",
         exemple: "Je dois toujours tout contrôler, sinon c'est inacceptable." },
-      { id: "etiquetage", nom: "Étiquetage", short: "Caricaturer une personne",
-        description: "Coller une étiquette globale sur soi ou une autre personne sans prendre en compte le contexte.",
-        exemple: "J'ai fait une erreur, je suis nul·le." },
       { id: "personnalisation", nom: "Personnalisation", short: "Se croire responsable de tout",
         description: "Se sentir responsable d'événements sans prendre en comtpe ce qui ne dépend pas ou peu de nous.",
         exemple: "Si ces personnes sont de mauvaise humeur, c'est sûrement à cause de moi." },
@@ -474,17 +471,16 @@
     ];
 
     var baseThoughts = [
-      { id: 1, texte: "Si je fais une erreur pendant la présentation, tout le monde va me trouver nul.", biasId: "catastrophisation" },
-      { id: 2, texte: "J'ai raté cet entretien, je n'arriverai jamais à trouver un travail.", biasId: "surgeneralisation" },
-      { id: 3, texte: "On m'a fait plusieurs compliments, mais je ne pense qu'à la remarque négative.", biasId: "abstraction_selective" },
-      { id: 4, texte: "Ils ne m'ont pas invité, c'est sûr qu'ils ne m'aiment pas.", biasId: "lecture_pensee" },
-      { id: 5, texte: "Je me sens angoissé, donc il doit forcément y avoir un danger.", biasId: "raisonnement_emotionnel" },
-      { id: 6, texte: "Si je ne réussis pas parfaitement cette tâche, c'est que je suis incompétent.", biasId: "tout_ou_rien" },
-      { id: 7, texte: "Ils me disent que je fais du bon travail, mais ils ne connaissent pas mon vrai niveau.", biasId: "disqualification_positif" },
-      { id: 8, texte: "Je dois toujours être disponible pour les autres, sinon je suis égoïste.", biasId: "exigences_personnelles" },
-      { id: 9, texte: "J'ai oublié ce rendez-vous, je suis vraiment un raté.", biasId: "etiquetage" },
-      { id: 10, texte: "Ils se disputent, c'est sûrement à cause de quelque chose que j'ai fait.", biasId: "personnalisation" },
-      { id: 11, texte: "test saut ccl.", biasId: "saut_aux_conclusions" }
+      { id: 1, texte: "Cette réponse avait une petite approximation, c'était une réponse tout à fait nulle.", biasId: "tout_ou_rien" },
+      { id: 2, texte: "J'ai un peu cherché mes mots en échangeant avec cette personne, je suis nul·le.", biasId: "tout_ou_rien" },
+      { id: 3, texte: "Si je ne suis pas le·a premier·e dans mon travail, je suis un·e incapable", biasId: "tout_ou_rien" },
+      { id: 4, texte: "J'ai raté cet entretien, je n'arriverai jamais à trouver un travail.", biasId: "surgeneralisation" },
+      { id: 5, texte: "Cette personne a fait une erreur, elle est incapable dans son entièreté.", biasId: "surgeneralisation" },
+      { id: 6, texte: "Ce restaurant que j'aimais bien a râté une fois un plat. C'est domamge il est devenu mauvais.", biasId: "surgeneralisation" },
+      { id: 7, texte: "Après une chouette soirée où au moment de partir j'ai taché ma chemise je me dis que la soirée était nulle. ", biasId: "abstraction_selective" },
+      { id: 8, texte: "Quand on me dis que je pourrais améliorer une caractéristique de mon travail qui par ailleurs est très bien, ce que je retiens est uniquement la piste d'amélioration. ", biasId: "abstraction_selective" },
+     { id: 9, texte: "J'ai passé toute l'après-midi avec une personne et on a bien rigolé mais on a eu un désaccord sur un point peu important. Quand je repense à l'après-midi, je pense uniquement au désaccord. ", biasId: "abstraction_selective" },
+      { id: 10, texte: "test saut ccl.", biasId: "saut_aux_conclusions" }
     ];
 
     var thoughts = [];
